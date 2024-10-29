@@ -31,6 +31,7 @@ import dev.lambdaurora.spruceui.widget.container.SpruceOptionListWidget;
 import dev.lambdaurora.spruceui.widget.container.tabbed.SpruceTabbedWidget;
 import net.minecraft.TextFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Text;
@@ -187,5 +188,14 @@ public class SettingsScreen extends SpruceScreen {
 		list.setBackground(INNER_BACKGROUND);
 		list.addAll(entries);
 		return list;
+	}
+
+	@Override
+	public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+		super.render(graphics, mouseX, mouseY, delta);
+
+		String version = LambDynLights.get().version();
+
+		graphics.drawText(this.font, version, this.width - this.font.width(version) - 3, 3, TextFormatting.DARK_GRAY.color(), false);
 	}
 }

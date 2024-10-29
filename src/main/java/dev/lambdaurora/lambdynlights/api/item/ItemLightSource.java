@@ -11,6 +11,7 @@ package dev.lambdaurora.lambdynlights.api.item;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import dev.lambdaurora.lambdynlights.api.item.ItemLuminance;
 import net.minecraft.advancements.critereon.ItemPredicate;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Range;

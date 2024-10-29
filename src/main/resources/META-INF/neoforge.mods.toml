@@ -1,0 +1,22 @@
+modLoader="javafml" #mandatory
+
+loaderVersion="[1,)" #mandatory
+
+license="Lambda License"
+
+[[mods]] #mandatory
+modId="lambdynlights" #mandatory
+version="${version}" #mandatory
+displayName="LambDynamicLights" #mandatory
+logoFile="assets/lambdynlights/icon.png" #optional
+logoBlur=false
+authors="LambdAurora, LostPattern" #optional
+
+# The description text for the mod (multi line!) (#mandatory)
+description='''Adds dynamic lighting to the game.'''
+
+# The [[mixins]] block allows you to declare your mixin config to FML so that it gets loaded.
+[[mixins]]
+config="lambdynlights.mixins.json"
+[[mixins]]
+config="lambdynlights.lightsource.mixins.json"

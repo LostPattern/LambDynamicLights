@@ -9,6 +9,8 @@
 
 package dev.lambdaurora.lambdynlights.api.item;
 
+import dev.lambdaurora.lambdynlights.api.item.ItemLightSource;
+import dev.lambdaurora.lambdynlights.api.item.ItemLuminance;
 import dev.yumi.commons.event.Event;
 import net.minecraft.advancements.critereon.ItemPredicate;
 import net.minecraft.core.RegistryAccess;

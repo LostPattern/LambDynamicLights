@@ -3,7 +3,7 @@ import lambdynamiclights.mappings.MojangMappingsSpec
 import org.gradle.accessors.dm.LibrariesForLibs
 
 plugins {
-	id("fabric-loom")
+	id("dev.architectury.loom")
 	`java-library`
 	`maven-publish`
 	id("dev.yumi.gradle.licenser")
@@ -15,7 +15,7 @@ val libs = the<LibrariesForLibs>()
 Constants.finalizeInit(libs)
 
 group = Constants.GROUP
-version = "${Constants.VERSION}+${Constants.mcVersion()}"
+version = "${Constants.VERSION}-neo-0+${Constants.mcVersion()}"
 
 loom {
 	runtimeOnlyLog4j = true
@@ -30,7 +30,7 @@ dependencies {
 		//parchment("org.parchmentmc.data:parchment-${Constants.getMcVersionString()}:${libs.versions.mappings.parchment.get()}@zip")
 		mappings("dev.lambdaurora:yalmm:${Constants.mcVersion()}+build.${libs.versions.mappings.yalmm.get()}")
 	})
-	modImplementation(libs.fabric.loader)
+	//modImplementation(libs.fabric.loader)
 
 	api(libs.yumi.commons.event)
 }

@@ -21,14 +21,14 @@ import dev.lambdaurora.lambdynlights.api.item.ItemLightSourceManager;
 import dev.yumi.commons.TriState;
 import dev.yumi.commons.Unit;
 import dev.yumi.commons.event.Event;
-import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
-import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.SharedConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.io.Resource;
 import net.minecraft.resources.io.ResourceManager;
+import net.minecraft.resources.io.ResourceReloader;
 import net.minecraft.util.profiling.Profiler;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
@@ -49,12 +49,12 @@ import java.util.concurrent.Executor;
  * @version 3.1.2
  * @since 1.3.0
  */
-public final class ItemLightSources implements ItemLightSourceManager, IdentifiableResourceReloadListener {
+public final class ItemLightSources implements ItemLightSourceManager, ResourceReloader {
 	private static final Logger LOGGER = LoggerFactory.getLogger("LambDynamicLights|ItemLightSources");
 	private static final Identifier RESOURCE_RELOADER_ID = Identifier.of(LambDynLightsConstants.NAMESPACE, "dynamiclights_resources");
 	private static final String SILENCE_ERROR_KEY = "silence_error";
 	private static final boolean FORCE_LOG_ERRORS = TriState.fromProperty("lambdynamiclights.resource.force_log_errors")
-			.toBooleanOrElse(FabricLoader.getInstance().isDevelopmentEnvironment());
+			.toBooleanOrElse(SharedConstants.IS_RUNNING_IN_IDE);
 
 	private final Event<Identifier, OnRegister> onRegisterEvent = LambDynLights.EVENT_MANAGER.create(OnRegister.class);
 	private final Minecraft client = Minecraft.getInstance();
@@ -62,10 +62,10 @@ public final class ItemLightSources implements ItemLightSourceManager, Identifia
 	private final List<LoadedItemLightSource> loadedLightSources = new ArrayList<>();
 	private final List<ItemLightSource> lightSources = new ArrayList<>();
 
-	@Override
-	public Identifier getFabricId() {
-		return RESOURCE_RELOADER_ID;
-	}
+	//@Override
+	//public Identifier getFabricId() {
+	//	return RESOURCE_RELOADER_ID;
+	//}
 
 	@Override
 	public CompletableFuture<Void> reload(Synchronizer synchronizer, ResourceManager resourceManager, Profiler prepareProfiler, Profiler applyProfiler, Executor prepareExecutor, Executor applyExecutor) {

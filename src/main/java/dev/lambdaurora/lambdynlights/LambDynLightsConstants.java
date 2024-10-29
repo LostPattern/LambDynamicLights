@@ -9,7 +9,9 @@
 
 package dev.lambdaurora.lambdynlights;
 
-import net.fabricmc.loader.api.FabricLoader;
+
+import net.neoforged.fml.ModList;
+import net.neoforged.fml.loading.LoadingModList;
 
 /**
  * Contains constants about LambDynamicLights.
@@ -33,8 +35,9 @@ public final class LambDynLightsConstants {
 	 * {@return {@code true} if this mod is in development mode, or {@code false} otherwise}
 	 */
 	public static boolean isDevMode() {
-		return FabricLoader.getInstance().getModContainer(NAMESPACE)
-				.map(modContainer -> modContainer.getMetadata().getVersion().getFriendlyString().endsWith("-local"))
-				.orElse(true);
+		var mod = LoadingModList.get().getModFileById(NAMESPACE);
+
+		return mod == null || mod.getMods().getFirst()
+                .getVersion().toString().endsWith("-local");
 	}
 }

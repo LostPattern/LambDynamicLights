@@ -11,18 +11,12 @@ package dev.lambdaurora.lambdynlights;
 
 import dev.lambdaurora.lambdynlights.accessor.WorldRendererAccessor;
 import dev.lambdaurora.lambdynlights.api.DynamicLightHandlers;
-import dev.lambdaurora.lambdynlights.api.DynamicLightsInitializer;
 import dev.lambdaurora.lambdynlights.engine.DynamicLightingEngine;
+import dev.lambdaurora.lambdynlights.gui.SettingsScreen;
 import dev.lambdaurora.lambdynlights.resource.item.ItemLightSources;
 import dev.yumi.commons.event.EventManager;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
-import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.CommonLifecycleEvents;
-import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
-import net.fabricmc.loader.api.FabricLoader;
-import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
+import net.minecraft.SharedConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.LightTexture;
@@ -36,6 +30,16 @@ import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockAndTintGetter;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent;
+import net.neoforged.neoforge.client.event.RenderFrameEvent;
+import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
+import net.neoforged.neoforge.event.TagsUpdatedEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -55,7 +59,9 @@ import java.util.function.Predicate;
  * @version 3.1.1
  * @since 1.0.0
  */
-public class LambDynLights implements ClientModInitializer {
+@Mod(value = "lambdynlights", dist = Dist.CLIENT)
+@EventBusSubscriber
+public class LambDynLights {
 	private static final Logger LOGGER = LoggerFactory.getLogger("LambDynamicLights");
 	public static final EventManager<Identifier> EVENT_MANAGER = new EventManager<>(Identifier.of(LambDynLightsConstants.NAMESPACE, "default"), Identifier::parse);
 	private static LambDynLights INSTANCE;
@@ -65,41 +71,60 @@ public class LambDynLights implements ClientModInitializer {
 	private final Set<DynamicLightSource> dynamicLightSources = new HashSet<>();
 	private final List<DynamicLightSource> toClear = new ArrayList<>();
 	private final ReentrantReadWriteLock lightSourcesLock = new ReentrantReadWriteLock();
+	private final ModContainer container;
 	private long lastUpdate = System.currentTimeMillis();
 	private int lastUpdateCount = 0;
 
-	@Override
-	public void onInitializeClient() {
+	public LambDynLights(ModContainer container) {
 		INSTANCE = this;
+		this.container = container;
 		log(LOGGER, "Initializing LambDynamicLights...");
 
 		this.config.load();
 
-		FabricLoader.getInstance().getEntrypointContainers("dynamiclights", DynamicLightsInitializer.class)
-				.stream()
-				.map(EntrypointContainer::getEntrypoint)
-				.forEach(initializer -> initializer.onInitializeDynamicLights(this.itemLightSources));
+		container.registerExtensionPoint(IConfigScreenFactory.class, (modContainer, screen) -> new SettingsScreen(screen));
 
-		ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(this.itemLightSources);
-
-		CommonLifecycleEvents.TAGS_LOADED.register((registries, client) -> {
-			this.itemLightSources.apply(registries);
-		});
-
-		ClientTickEvents.END_WORLD_TICK.register(level -> {
-			this.lightSourcesLock.writeLock().lock();
-			this.engine.computeSpatialLookup(this.dynamicLightSources);
-			this.toClear.forEach(source -> source.lambdynlights$scheduleTrackedChunksRebuild(Minecraft.getInstance().levelRenderer));
-			this.toClear.clear();
-			this.lightSourcesLock.writeLock().unlock();
-		});
-
-		WorldRenderEvents.START.register(context -> {
-			Minecraft.getInstance().getProfiler().swap("dynamic_lighting");
-			this.updateAll(context.worldRenderer());
-		});
+		// todo fix this
+		//FabricLoader.getInstance().getEntrypointContainers("dynamiclights", DynamicLightsInitializer.class)
+		//		.stream()
+		//		.map(EntrypointContainer::getEntrypoint)
+		//		.forEach(initializer -> initializer.onInitializeDynamicLights(this.itemLightSources));
 
 		DynamicLightHandlers.registerDefaultHandlers();
+	}
+
+	public String version() {
+		return this.container.getModInfo().getVersion().toString();
+	}
+
+	@EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD)
+	public static class Modbus {
+		@SubscribeEvent()
+		public static void registerReloader(RegisterClientReloadListenersEvent event) {
+			event.registerReloadListener(INSTANCE.itemLightSources);
+		}
+	}
+
+	@SubscribeEvent
+	public static void tagsLoaded(TagsUpdatedEvent event) {
+		INSTANCE.itemLightSources.apply(event.getRegistryAccess());
+	}
+
+	@SubscribeEvent
+	public static void endWorldTick(ClientTickEvent.Post event) {
+		INSTANCE.lightSourcesLock.writeLock().lock();
+		INSTANCE.engine.computeSpatialLookup(INSTANCE.dynamicLightSources);
+		INSTANCE.toClear.forEach(source -> source.lambdynlights$scheduleTrackedChunksRebuild(Minecraft.getInstance().levelRenderer));
+		INSTANCE.toClear.clear();
+		INSTANCE.lightSourcesLock.writeLock().unlock();
+	}
+
+	@SubscribeEvent
+	public static void worldRender(RenderFrameEvent.Pre event) {
+		if (Minecraft.getInstance().level != null) {
+			Minecraft.getInstance().getProfiler().swap("dynamic_lighting");
+			INSTANCE.updateAll(Minecraft.getInstance().levelRenderer);
+		}
 	}
 
 	/**
@@ -312,7 +337,7 @@ public class LambDynLights implements ClientModInitializer {
 	 * @param msg the message to log
 	 */
 	public static void log(Logger logger, String msg) {
-		if (!FabricLoader.getInstance().isDevelopmentEnvironment()) {
+		if (!SharedConstants.IS_RUNNING_IN_IDE) {
 			msg = "[LambDynLights] " + msg;
 		}
 
@@ -326,7 +351,7 @@ public class LambDynLights implements ClientModInitializer {
 	 * @param msg the message to log
 	 */
 	public static void warn(Logger logger, String msg) {
-		if (!FabricLoader.getInstance().isDevelopmentEnvironment()) {
+		if (!SharedConstants.IS_RUNNING_IN_IDE) {
 			msg = "[LambDynLights] " + msg;
 		}
 
@@ -340,7 +365,7 @@ public class LambDynLights implements ClientModInitializer {
 	 * @param msg the message to log
 	 */
 	public static void warn(Logger logger, String msg, Object... args) {
-		if (!FabricLoader.getInstance().isDevelopmentEnvironment()) {
+		if (!SharedConstants.IS_RUNNING_IN_IDE) {
 			msg = "[LambDynLights] " + msg;
 		}
 

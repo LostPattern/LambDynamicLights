@@ -14,7 +14,7 @@ plugins {
 base.archivesName.set(Constants.NAME)
 
 if (!(System.getenv("CURSEFORGE_TOKEN") != null || System.getenv("MODRINTH_TOKEN") != null || System.getenv("LDL_MAVEN") != null)) {
-	version = (version as String) + "-local"
+	//version = (version as String) + "-local"
 }
 logger.lifecycle("Preparing version ${version}...")
 
@@ -44,6 +44,15 @@ repositories {
 			includeGroup("maven.modrinth")
 		}
 	}
+	maven {
+		name = "NeoForged"
+		url = uri("https://maven.neoforged.net/releases")
+	}
+	maven {
+		url = uri("https://maven.su5ed.dev/releases")
+	}
+
+	mavenLocal()
 }
 
 loom {
@@ -51,26 +60,40 @@ loom {
 }
 
 dependencies {
-	implementation(project(":api", configuration = "namedElements"))
+	//implementation(project(":api", configuration = "namedElements"))
 
-	modImplementation(libs.fabric.api)
+	//modImplementation(libs.fabric.api)
 
-	implementation(libs.nightconfig.core)
-	implementation(libs.nightconfig.toml)
+	//implementation(libs.nightconfig.core)
+	//implementation(libs.nightconfig.toml)
 	modImplementation(libs.spruceui)
 	include(libs.spruceui)
 	modImplementation(libs.pridelib)
 	include(libs.pridelib)
 
-	modImplementation(libs.modmenu) {
-		this.isTransitive = false
-	}
 
-	modRuntimeOnly(libs.sodium)
+	//modImplementation(libs.modmenu) {
+	//	this.isTransitive = false
+	//}
 
-	shadow(project(":api", configuration = "namedElements")) {
+	//modRuntimeOnly(libs.sodium)
+
+	//forgeRuntimeLibrary(project(":api", configuration = "namedElements"))
+	forgeRuntimeLibrary("org.jetbrains:annotations:26.0.1")
+
+	forgeRuntimeLibrary(libs.yumi.commons.core) {
 		isTransitive = false
 	}
+	forgeRuntimeLibrary(libs.yumi.commons.collections) {
+		isTransitive = false
+	}
+	forgeRuntimeLibrary(libs.yumi.commons.event) {
+		isTransitive = false
+	}
+
+	//shadow(project(":api", configuration = "namedElements")) {
+	//	isTransitive = false
+	//}
 	shadow(libs.yumi.commons.core) {
 		isTransitive = false
 	}
@@ -80,15 +103,17 @@ dependencies {
 	shadow(libs.yumi.commons.event) {
 		isTransitive = false
 	}
-	shadow(libs.nightconfig.core)
-	shadow(libs.nightconfig.toml)
+	//shadow(libs.nightconfig.core)
+	//shadow(libs.nightconfig.toml)
+
+	neoForge("net.neoforged:neoforge:21.1.66")
 }
 
 tasks.processResources {
 	val version = project.version
 	inputs.property("version", version)
 
-	filesMatching("fabric.mod.json") {
+	filesMatching("META-INF/neoforge.mods.toml") {
 		expand("version" to version)
 	}
 }
@@ -99,7 +124,7 @@ tasks.shadowJar {
 	destinationDirectory.set(file("${project.layout.buildDirectory.get()}/devlibs"))
 	archiveClassifier.set("dev")
 
-	relocate("com.electronwill.nightconfig", "dev.lambdaurora.lambdynlights.shadow.nightconfig")
+	//relocate("com.electronwill.nightconfig", "dev.lambdaurora.lambdynlights.shadow.nightconfig")
 }
 
 tasks.remapJar {
