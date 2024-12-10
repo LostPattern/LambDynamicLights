@@ -11,6 +11,7 @@ package dev.lambdaurora.lambdynlights.mixin;
 
 import dev.lambdaurora.lambdynlights.LambDynLights;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.main.GameConfig;
 import net.minecraft.client.multiplayer.ClientLevel;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -31,5 +32,10 @@ public class MinecraftClientMixin {
 	@Inject(method = "updateLevelInEngines", at = @At("HEAD"))
 	private void onUpdateLevelInEngines(ClientLevel level, CallbackInfo ci) {
 		LambDynLights.get().clearLightSources();
+	}
+
+	@Inject(method = "<init>", at = @At("TAIL"))
+	private void onInitTail(GameConfig arg, CallbackInfo ci) {
+		LambDynLights.onInitLate();
 	}
 }

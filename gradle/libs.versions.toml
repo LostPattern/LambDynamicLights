@@ -37,7 +37,7 @@ spruceui = { module = "dev.lambdaurora:spruceui", version.ref = "spruceui" }
 pridelib = { module = "io.github.queerbric:pridelib", version.ref = "pridelib" }
 modmenu = { module = "com.terraformersmc:modmenu", version.ref = "modmenu" }
 trinkets = { module = "dev.emi:trinkets", version.ref = "trinkets" }
-accessories = { module = "io.wispforest:accessories-fabric", version.ref = "accessories" }
+accessories = { module = "io.wispforest:accessories-neoforge", version.ref = "accessories" }
 sodium = { module = "maven.modrinth:sodium", version.ref = "sodium" }
 
 # Configuration

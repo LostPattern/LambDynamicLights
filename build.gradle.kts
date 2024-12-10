@@ -57,6 +57,11 @@ repositories {
 		url = uri("https://maven.su5ed.dev/releases")
 	}
 
+	maven {
+		name = "OctoStudios"
+		url = uri("https://maven.octo-studios.com/releases")
+	}
+
 	mavenLocal()
 }
 
@@ -116,6 +121,8 @@ dependencies {
 	//shadow(libs.nightconfig.toml)
 
 	neoForge("net.neoforged:neoforge:21.1.66")
+	modCompileOnly("top.theillusivec4.curios:curios-neoforge:9.0.15+1.21.1")
+
 }
 
 tasks.processResources {

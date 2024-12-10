@@ -10,8 +10,8 @@
 package dev.lambdaurora.lambdynlights.compat;
 
 import dev.lambdaurora.lambdynlights.LambDynLights;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.world.entity.LivingEntity;
+import net.neoforged.fml.ModList;
 import org.jetbrains.annotations.Range;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,10 +48,10 @@ public interface CompatLayer {
 		var layers = new ArrayList<CompatLayer>();
 
 		try {
-			if (FabricLoader.getInstance().isModLoaded("accessories")) {
+			if (ModList.get().isLoaded("accessories")) {
 				layers.add(new AccessoriesCompat());
-			} else if (FabricLoader.getInstance().isModLoaded("trinkets")) {
-				layers.add(new TrinketsCompat());
+			} else if (ModList.get().isLoaded("curios")) {
+				layers.add(new CuriosCompat());
 			}
 		} catch (LinkageError e) {
 			LambDynLights.error(

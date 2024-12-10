@@ -9,27 +9,28 @@
 
 package dev.lambdaurora.lambdynlights.compat;
 
-//import dev.emi.trinkets.api.TrinketsApi;
 import dev.lambdaurora.lambdynlights.LambDynLights;
 import net.minecraft.world.entity.LivingEntity;
+import top.theillusivec4.curios.api.CuriosApi;
 
 /**
- * Represents the Trinkets compatibility layer.
+ * Represents the Accessories compatibility layer.
  *
  * @author LambdAurora
  * @version 3.1.4
  * @since 3.1.4
  */
-/*final class TrinketsCompat implements CompatLayer {
+final class CuriosCompat implements CompatLayer {
 	@Override
 	public int getLivingEntityLuminanceFromItems(LivingEntity entity, boolean submergedInWater) {
 		int luminance = 0;
-		var component = TrinketsApi.getTrinketComponent(entity);
+		var inventory = CuriosApi.getCuriosInventory(entity);
 
-		if (component.isPresent()) {
-			for (var equipped : component.get().getAllEquipped()) {
-				if (!equipped.getB().isEmpty()) {
-					luminance = Math.max(luminance, LambDynLights.getLuminanceFromItemStack(equipped.getB(), submergedInWater));
+		if (inventory.isPresent()) {
+			for (var handler : inventory.get().getCurios().values()) {
+				var stacks = handler.getStacks();
+				for (var slot = 0; slot < stacks.getSlots(); slot++) {
+					luminance = Math.max(luminance, LambDynLights.getLuminanceFromItemStack(stacks.getStackInSlot(slot), submergedInWater));
 
 					if (luminance >= 15) {
 						break;
@@ -40,4 +41,4 @@ import net.minecraft.world.entity.LivingEntity;
 
 		return luminance;
 	}
-}*/
+}

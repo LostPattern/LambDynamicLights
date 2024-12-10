@@ -35,6 +35,7 @@ import net.minecraft.world.level.BlockAndTintGetter;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
@@ -91,6 +92,36 @@ public class LambDynLights {
 		//		.stream()
 		//		.map(EntrypointContainer::getEntrypoint)
 		//		.forEach(initializer -> initializer.onInitializeDynamicLights(this.itemLightSources));
+	}
+
+	public static void onInitLate() {
+		for (var mod : ModList.get().getMods()) {
+			var entrypoint = mod.getModProperties().get("lambdynamiclights_init");
+			if (entrypoint instanceof String string) {
+				Class<?> clazz;
+				try {
+					clazz = Class.forName(string);
+				} catch (ClassNotFoundException e) {
+					warn(LOGGER, "Entrypoint provided by mod " + mod.getModId() + " is not valid. Failed to load class.", e);
+                	continue;
+				}
+
+				if (!DynamicLightsInitializer.class.isAssignableFrom(clazz)) {
+					warn(LOGGER, "Entrypoint provided by mod " + mod.getModId() + " is not valid. Initializer doesn't implement DynamicLightsInitializer");
+					continue;
+				}
+
+				try {
+					((DynamicLightsInitializer) clazz.getConstructor().newInstance()).onInitializeDynamicLights(get().itemLightSources);
+				} catch (Throwable e) {
+					warn(LOGGER, "Entrypoint provided by mod " + mod.getModId() + " is not valid. Failed to initialize!", e);
+				}
+
+            } else if (entrypoint != null) {
+				warn(LOGGER, "Entrypoint provided by mod " + mod.getModId() + " is not valid. Expected class name as String, got " + entrypoint.getClass().getName() + ".");
+			}
+		}
+
 
 		DynamicLightHandlers.registerDefaultHandlers();
 	}
