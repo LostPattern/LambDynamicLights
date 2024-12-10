@@ -212,6 +212,14 @@
 - Fixed dynamic lighting of various projectiles.
 - Fixed water-sensitive items lighting up underwater while they shouldn't.
 
+### 3.1.3
+
+- Fixed item frames and other "block-attached" entities not ticking properly on the integrated server.
+
+### 3.1.4
+
+- Added support for Trinkets and Accessories.
+
 [SpruceUI]: https://github.com/LambdAurora/SpruceUI "SpruceUI page"
 [pridelib]: https://github.com/Queerbric/pridelib "Pridelib page"
 [Sodium]: https://modrinth.com/mod/sodium "Sodium Modrinth page"

@@ -10,6 +10,8 @@ yumi-commons = "1.0.0-alpha.1"
 spruceui = "5.1.0+neo-t0+1.21.1"
 pridelib = "1.2.1+neo-t2+1.21.1"
 modmenu = "11.0.1"
+trinkets = "3.10.0"
+accessories = "1.1.0-beta.16+1.21.1"
 sodium = "mc1.21-0.5.9"
 
 # Configuration
@@ -34,6 +36,8 @@ yumi-commons-event = { module = "dev.yumi.commons:yumi-commons-event", version.r
 spruceui = { module = "dev.lambdaurora:spruceui", version.ref = "spruceui" }
 pridelib = { module = "io.github.queerbric:pridelib", version.ref = "pridelib" }
 modmenu = { module = "com.terraformersmc:modmenu", version.ref = "modmenu" }
+trinkets = { module = "dev.emi:trinkets", version.ref = "trinkets" }
+accessories = { module = "io.wispforest:accessories-fabric", version.ref = "accessories" }
 sodium = { module = "maven.modrinth:sodium", version.ref = "sodium" }
 
 # Configuration

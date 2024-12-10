@@ -11,6 +11,8 @@ package dev.lambdaurora.lambdynlights;
 
 import dev.lambdaurora.lambdynlights.accessor.WorldRendererAccessor;
 import dev.lambdaurora.lambdynlights.api.DynamicLightHandlers;
+import dev.lambdaurora.lambdynlights.api.DynamicLightsInitializer;
+import dev.lambdaurora.lambdynlights.compat.CompatLayer;
 import dev.lambdaurora.lambdynlights.engine.DynamicLightingEngine;
 import dev.lambdaurora.lambdynlights.gui.SettingsScreen;
 import dev.lambdaurora.lambdynlights.resource.item.ItemLightSources;
@@ -373,6 +375,20 @@ public class LambDynLights {
 	}
 
 	/**
+	 * Logs an error message.
+	 *
+	 * @param logger the logger to use
+	 * @param msg the message to log
+	 */
+	public static void error(Logger logger, String msg, Object... args) {
+		if (!SharedConstants.IS_RUNNING_IN_IDE) {
+			msg = "[LambDynLights] " + msg;
+		}
+
+		logger.error(msg, args);
+	}
+
+	/**
 	 * Schedules a chunk rebuild at the specified chunk position.
 	 *
 	 * @param renderer the renderer
@@ -446,6 +462,16 @@ public class LambDynLights {
 		for (var equipped : entity.getAllSlots()) {
 			if (!equipped.isEmpty())
 				luminance = Math.max(luminance, LambDynLights.getLuminanceFromItemStack(equipped, submergedInFluid));
+		}
+
+		if (luminance < 15) {
+			for (var compat : CompatLayer.LAYERS) {
+				luminance = Math.max(luminance, compat.getLivingEntityLuminanceFromItems(entity, submergedInFluid));
+
+				if (luminance >= 15) {
+					break;
+				}
+			}
 		}
 
 		return luminance;
